@@ -20,7 +20,7 @@ This project involves developing a frontend server for the "Ausleihe" lending pl
   - Ensures smooth user interactions for viewing items, borrowing items, and managing user details.
 
 - **Design and Usability:**
-  - Focuses on intuitive navigation and a user-friendly design, following best practices in web design.
+  - Focuses on intuitive navigation and a user-friendly design.
 
 ### Video Overview
 
