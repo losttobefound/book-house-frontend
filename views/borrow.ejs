@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Leihvorgänge</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .custom-color {
+            color: #bc747f;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            color: #bc747f;
+            flex: 1;
+        }
+
+        .form-control {
+            font-size: 1rem;
+            color: grey;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .btn-custom {
+            background-color: #bc747f;
+            color: white;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #a65d64;
+        }
+    </style>
+</head>
+<body>
+<% include ./navbar.ejs %>
+
+<div class="container mt-3.8">
+    <div id="form-container" class="mx-auto" style="max-width: 360px; margin-top: 14px">
+        <div class="card-body m-2 p-2">
+            <h2 class="card-title text-center"
+                style="font-size: 2.0rem; color: #bc747f; margin-bottom: 20px; margin-top: 35px;">Leihvorgänge</h2>
+            <form id="borrow-form">
+                <div class="mb-3 row">
+                    <label for="borrow-id" class="col-sm-3 form-label">ID:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" id="borrow-id" required>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="user-id" class="col-sm-3 form-label">User:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" id="user-id" required>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="borrowed-items" class="col-sm-3 form-label">Book Nummer:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="borrowed-items" required>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="end-date" class="col-sm-3 form-label">Enddatum:</label>
+                    <div class="col-sm-8">
+                        <input type="date" class="form-control" id="end-date" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn w-100" style="background-color: #bc747f; color: white;">Aktualisieren
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<% include ./footer.ejs %>
+
+<script>
+    document.getElementById('borrow-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const id = document.getElementById('borrow-id').value;
+        const userid = document.getElementById('user-id').value;
+        const equipmentids = document.getElementById('borrowed-items').value.split(',').map(id => parseInt(id.trim()));
+        const endDate = document.getElementById('end-date').value;
+
+        // Data to send to the backend
+        const data = {
+            userid,
+            equipmentids,
+            end: endDate
+        };
+
+        // Send PUT request to update the borrow record
+        axios.put(`/borrow/${id}`, data)
+            .then(response => {
+                console.log('Success:', response.data);
+                alert('Borrow record updated successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error.response ? error.response.data : error.message);
+                alert('Failed to update the borrow record.');
+            });
+    });
+</script>
+</body>
+</html>

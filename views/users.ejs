@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login or Register</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<% include ./navbar.ejs %>
+
+<div class="container mt-3.8">
+    <div id="form-container" class="mx-auto" style="max-width: 360px; margin-top: 14px ">
+        <!-- Form content will be inserted here -->
+    </div>
+</div>
+
+<% include ./footer.ejs %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formContainer = document.getElementById('form-container');
+
+        function showLoginForm() {
+            formContainer.innerHTML = `
+                    <div class="card-body m-2 p-2">
+                        <h2 class="card-title text-center" style="font-size: 2.0rem; color: #bc747f; margin-bottom: 20px; margin-top: 35px;">Login</h2>
+                        <form id="login-form">
+                            <div class="mb-3">
+                                <label for="username" class="form-label" style="font-size: 1rem; color: #bc747f;">Username</label>
+                                <input type="text" class="form-control" style="font-size: 1rem; color: grey;" id="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label" style="font-size: 1rem; color: #bc747f;">Password</label>
+                                <input type="password" class="form-control" style="font-size: 1rem; color: grey;" id="password" required>
+                            </div>
+                            <button type="submit" class="btn w-100" style="background-color: #bc747f; color: white;">Login</button>
+                        </form>
+                        <p id="message" class="mt-3 text-center"></p>
+                    </div>
+                `;
+
+            document.getElementById('login-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                loginUser(username, password);
+            });
+        }
+
+        function showRegistrationForm(username) {
+            formContainer.innerHTML = `
+                    <div class="card-body m-2 p-2">
+                        <h2 class="card-title text-center" style="font-size: 2.0rem; color: #bc747f; margin-bottom: 20px; margin-top: 20px">Registration</h2>
+                        <form id="register-form">
+                            <div class="mb-3">
+                                <label for="username" class="form-label" style="font-size: 1rem; color: #bc747f;">Username</label>
+                                <input type="text" class="form-control" style="font-size: 1rem; color: grey;" id="reg-username" value="${username}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label" style="font-size: 1rem; color: #bc747f;">Email</label>
+                                <input type="email" class="form-control" style="font-size: 1rem; color: grey;" id="reg-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label" style="font-size: 1rem; color: #bc747f;">Password</label>
+                                <input type="password" class="form-control" style="font-size: 1rem; color: grey;" id="reg-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" style="background-color: #bc747f; color: white; border-color: #bc747f;">Register</button>
+                        </form>
+                        <p id="reg-message" class="mt-3 text-center"></p>
+                    </div>
+                `;
+
+            document.getElementById('register-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const username = document.getElementById('reg-username').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+
+                registerUser(username, email, password);
+            });
+        }
+
+        async function loginUser(username, password) {
+            try {
+                // Check if the user exists
+                const response = await axios.get('/users/byName', {
+                    params: {username: username}
+                });
+
+                // Handle successful login (user exists)
+                document.getElementById('message').textContent = `Logged in as ${username}`;
+                formContainer.innerHTML = `
+                        <h2 class="text-center" style="font-size: 2.0rem; color: #bc747f; margin-top: 60px"> Hallo ${username}!</h2>
+                        <br />
+                        <p class="text-center">
+                            <a style="font-size: 1.0rem; color: #bc747f; margin-top: 70px" href="/#">zurück zu Startseite</a>
+                        </p>
+                    `;
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    // User not found, proceed to registration
+                    document.getElementById('message').textContent = 'Nicht gefunden. Neuen Benutzer registrieren...';
+                    setTimeout(() => {
+                        showRegistrationForm(username);
+                    }, 2000);
+                } else {
+                    // Handle other errors
+                    console.error('Error:', error);
+                    document.getElementById('message').textContent = 'Fehler...Bitte versuchen Sie es erneut.';
+                }
+            }
+        }
+
+        async function registerUser(username, email, password) {
+            try {
+                const response = await axios.post('/users', {
+                    username: username,
+                    email: email,
+                    password: password,
+                });
+
+                // Handle successful registration
+                document.getElementById('reg-message').textContent = `Registered as ${username}`;
+                formContainer.innerHTML = `
+                        <h2 class="text-center" style="font-size: 2.0rem; color: #bc747f; margin-top: 60px">Registrierung erfolgreich!</h2>
+                        <br />
+                        <p class="text-center">
+                            <a style="font-size: 1.0rem; color: #bc747f; margin-top: 70px" href="/users">zurück zu Login</a>
+                        </p>
+                    `;
+            } catch (error) {
+                // Handle registration errors
+                console.error('Error:', error);
+                document.getElementById('reg-message').textContent = 'Fehler...Bitte versuchen Sie es erneut.';
+            }
+        }
+
+        showLoginForm();
+    });
+</script>
+</body>
+</html>

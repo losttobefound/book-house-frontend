@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Meine Artikel</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .custom-color {
+            color: #bc747f;
+        }
+
+        .btn-custom {
+            background-color: #976268;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #7a4e50;
+        }
+
+        .product-card {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .product-image {
+            background-size: cover;
+            background-position: center;
+            height: 150px;
+            border-radius: 8px;
+        }
+
+        .product-info {
+            margin-top: 10px;
+        }
+
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-date {
+            color: #e87c64;
+            margin-bottom: 10px;
+        }
+
+        .mobile-icon {
+            display: none;
+        }
+
+        .info-section {
+            color: #bc747f;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .info-message {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .redirect-btn {
+            display: inline-block;
+            background-color: #976268;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .redirect-btn:hover {
+            background-color: #7a4e50;
+        }
+
+        @media (max-width: 576px) {
+            .alignement {
+                padding-top: 20px;
+            }
+
+            .remove {
+                display: none;
+            }
+
+            .mobile-icon {
+                border-radius: 50%;
+                background-color: #bc747f;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                border: none;
+            }
+
+            .contPlus {
+                margin-top: 20px;
+            }
+
+            .products {
+                margin-top: 60px;
+            }
+
+            .btn.btn-light {
+                background-color: transparent !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<% include ./navbar.ejs %>
+
+<main>
+    <div class="d-flex justify-content-between align-items-center mb-4" style="padding: 0 15px;">
+        <h4 class="m-0 custom-color alignement">Meine Artikel:</h4>
+        <div class="d-flex align-items-center">
+            <a href="/" class="btn-custom me-2 remove">Neue Artikel hinzufügen</a>
+            <button class="btn btn-light">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="25" fill="#976268"
+                     class="bi bi-filter-circle-fill remove" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M3.5 5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1 0-1M5 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/>
+                </svg>
+                <div class="contPlus">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" class="bi bi-plus mobile-icon"
+                         viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <div id="info-section" class="info-section">
+        <p class="info-frist">Rückgabefrist für alle ausgeliehenen Artikel: 31.12.2024</p>
+        <p class="info-message">Um die Rückgabefrist ihrer ausgeliehenen Artikel zu verlängern, aktualisieren Sie bitte
+            Ihre Leihvorgänge.</p>
+        <a href="/borrow" class="redirect-btn">Zu den Leihvorgängen</a>
+    </div>
+
+    <div class="slider-container">
+        <button id="prev-btn" class="slider-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#976268" class="bi bi-caret-left"
+                 viewBox="0 0 16 16">
+                <path d="M10 12.796V3.204L4.519 8zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753"/>
+            </svg>
+        </button>
+
+        <div class="product-display products">
+            <div id="product-slider" class="product-slider">
+                <!-- Die Produkte werden hier dynamisch geladen -->
+            </div>
+        </div>
+
+        <button id="next-btn" class="slider-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#976268" class="bi bi-caret-right"
+                 viewBox="0 0 16 16">
+                <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
+            </svg>
+        </button>
+    </div>
+</main>
+
+<% include ./footer.ejs %>
+
+<script>
+    const products = [
+        {id: 1, image: '/uploads/book1.png', title: 'Product 1'},
+        {id: 5, image: '/uploads/book4.png', title: 'Product 5'}
+    ];
+
+    function populateSlider(items) {
+        const productSlider = document.getElementById('product-slider');
+        productSlider.innerHTML = '';
+
+        items.forEach(item => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+            productCard.innerHTML = `
+                    <div class="product-image" style="background-image: url('${item.pic}')"></div>
+                    <div class="product-info">
+                        <div class="product-title">${item.name}</div>
+                        <div class="product-date">Rückgabefrist: ${new Date(item.returnDate).toLocaleDateString()}</div>
+                    </div>
+                `;
+            productSlider.appendChild(productCard);
+        });
+    }
+</script>
+</body>
+
+</html>
+

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .alert-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 150px;
+            padding: 15px;
+            background-color: #976268;
+            color: white;
+            border-radius: 5px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+<% include ./navbar.ejs %>
+
+<!--Home Content-->
+<main>
+    <div class="search-container">
+        <input class="formatting" type="text" style="font-size: 1rem; color: grey;" placeholder="Leihartikel suchen">
+        <button class="filter-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="25" fill="white" class="bi bi-filter-circle-fill filterbtn"
+                 viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M3.5 5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1 0-1M5 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="slider-container">
+        <button id="prev-btn" class="slider-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#976268" class="bi bi-caret-left"
+                 viewBox="0 0 16 16">
+                <path d="M10 12.796V3.204L4.519 8zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753"/>
+            </svg>
+        </button>
+
+        <div class="product-display">
+            <div id="product-slider" class="product-slider">
+                <!-- Products will be inserted here -->
+            </div>
+        </div>
+
+        <button id="next-btn" class="slider-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#976268" class="bi bi-caret-right"
+                 viewBox="0 0 16 16">
+                <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
+            </svg>
+        </button>
+    </div>
+</main>
+
+<div id="alert-message" class="alert-message">
+    Der Artikel wurde erfolgreich ausgeliehen.
+</div>
+
+<% include ./footer.ejs %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const products = [
+            {id: 1, image: '/uploads/book1.png', title: 'Product 1'},
+            {id: 2, image: '/uploads/book5.png', title: 'Product 2'},
+            {id: 3, image: '/uploads/book3.png', title: 'Product 3'},
+            {id: 4, image: '/uploads/book2.png', title: 'Product 4'},
+            {id: 5, image: '/uploads/book4.png', title: 'Product 5'}
+        ];
+
+        const productSlider = document.getElementById('product-slider');
+
+        function populateSlider() {
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.setAttribute('data-id', product.id);
+                productCard.innerHTML = `
+                        <div class="product-image" style="background-image: url('${product.image}')"></div>
+                        <button class="borrow-btn">Ausleihen</button>
+                    `;
+                productCard.querySelector('.borrow-btn').addEventListener('click', () => borrowItem(product));
+                productSlider.appendChild(productCard);
+            });
+        }
+
+        async function borrowItem(product) {
+            try {
+                const newItem = {
+                    articlenumber: product.id,
+                    title: product.title,
+                    description: 'No description available',
+                    count: 1,
+                    userid: 1,
+                    pic: product.image
+                };
+
+                const response = await fetch('/equipment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newItem)
+                });
+
+                if (response.ok) {
+                    showAlertMessage('Der Artikel wurde erfolgreich ausgeliehen.');
+                    setTimeout(() => window.location.href = '/equipment', 2000);
+                } else {
+                    const data = await response.json();
+                    alert(`Failed to borrow item. ${data.error || 'Please try again.'}`);
+                }
+            } catch (error) {
+                console.error('Error borrowing item:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        function showAlertMessage(message) {
+            const alertMessage = document.getElementById('alert-message');
+            alertMessage.textContent = message;
+            alertMessage.style.display = 'block';
+            setTimeout(() => {
+                alertMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        document.getElementById('next-btn').addEventListener('click', () => moveSlider('next'));
+        document.getElementById('prev-btn').addEventListener('click', () => moveSlider('prev'));
+
+        populateSlider();
+    });
+
+    function moveSlider(direction) {
+        const slider = document.querySelector('.product-slider');
+        const slideWidth = document.querySelector('.product-card').offsetWidth;
+        const currentScroll = slider.scrollLeft;
+        const newScroll = direction === 'next' ? currentScroll + slideWidth : currentScroll - slideWidth;
+        slider.scrollLeft = newScroll;
+    }
+</script>
+
+</body>
+</html>
